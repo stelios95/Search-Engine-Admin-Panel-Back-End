@@ -79,7 +79,7 @@ seedRoutes.route("/add").post((req, res) => {
 });
 
 seedRoutes.route("/fetchAll").get((req, res) => {
-  Seed.find({}, "_id page")
+  Seed.find({}, "page _id")
     .then(seeds => {
       res.status(200).send(seeds);
     })
