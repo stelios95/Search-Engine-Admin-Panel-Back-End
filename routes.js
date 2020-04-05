@@ -4,34 +4,11 @@ let jwt = require("jsonwebtoken");
 let Seed = require("./seedSchema");
 let User = require("./userSchema");
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
+
 
 seedRoutes.route("/login").post((req, res) => {
-  const reqHash = await bcrypt.hash(req.body.password, saltRounds) 
-  User.findOne({ username: req.body.username})
-    .then(result => {
-      if(result.password){
-        let hashMatches = await bcrypt.compare(result.password, reqHash)
-      }
-      if (result && hashMatches) {
-        const payload = {
-          username: result.username
-        };
-        let token = jwt.sign(payload, "superSecret", {
-          expiresIn: 60 * 60 * 24 // expires in 24 hours
-        });
-        res.status(200).json({
-          message: "OK",
-          token: token
-        });
-      } else {
-        res.status(401).send({ message: "Invalid Credentials" });
-      }
-    })
-    .catch(err => {
-      res.status(400).send(err);
-    });
-});
+  loginManage(req, res)
+})
 
 seedRoutes.use((req, res, next) => {
   console.log(req.headers.authorization);
@@ -100,4 +77,30 @@ seedRoutes.route("/removeSeeds").post((req, res) => {
     });
 });
 
+async function loginManage(req, res){
+  try {
+    const saltRounds = 10;
+    hash = await bcrypt.hash(req.body.password, saltRounds)
+    user = await User.findOne({ username: req.body.username})
+    if(user.length > 0){
+      hashMatches = await bcrypt.compare(user.password, hash)
+    }
+    if(user.length > 0 && hashMatches){
+      const payload = {
+        username: user.username
+      };
+      let token = jwt.sign(payload, "superSecret", {
+        expiresIn: 60 * 60 * 24 // expires in 24 hours
+      })
+      res.status(200).json({
+        message: "OK",
+        token: token
+      })
+    } else {
+      res.status(401).send({ message: "Invalid Credentials" });
+    }
+  } catch (err) {
+    res.send(500).json({message: 'A Server Error Occured!'})
+  }
+}
 module.exports = seedRoutes;
