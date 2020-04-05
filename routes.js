@@ -3,14 +3,17 @@ const seedRoutes = express.Router();
 let jwt = require("jsonwebtoken");
 let Seed = require("./seedSchema");
 let User = require("./userSchema");
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 seedRoutes.route("/login").post((req, res) => {
-  console.log("body: " + JSON.stringify(req.body));
-  User.findOne({ username: req.body.username, password: req.body.password })
+  const reqHash = await bcrypt.hash(req.body.password, saltRounds) 
+  User.findOne({ username: req.body.username})
     .then(result => {
-      console.log(result);
-      if (result) {
-        console.log("1");
+      if(result.password){
+        let hashMatches = await bcrypt.compare(result.password, reqHash)
+      }
+      if (result && hashMatches) {
         const payload = {
           username: result.username
         };
@@ -22,12 +25,10 @@ seedRoutes.route("/login").post((req, res) => {
           token: token
         });
       } else {
-        console.log("2");
         res.status(401).send({ message: "Invalid Credentials" });
       }
     })
     .catch(err => {
-      console.log("3");
       res.status(400).send(err);
     });
 });
