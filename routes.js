@@ -4,8 +4,10 @@ let jwt = require("jsonwebtoken");
 let Seed = require("./seedSchema");
 let User = require("./userSchema");
 const bcrypt = require('bcrypt');
+const cors = require("cors");
+const app = express()
 
-
+app.use(cors())
 seedRoutes.route("/login").post((req, res) => {
   loginManage(req, res)
 })
