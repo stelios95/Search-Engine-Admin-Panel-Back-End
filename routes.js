@@ -1,4 +1,5 @@
 const express = require("express");
+const axios = require('axios')
 const seedRoutes = express.Router();
 let jwt = require("jsonwebtoken");
 let Seed = require("./seedSchema");
@@ -72,6 +73,20 @@ seedRoutes.route("/removeSeeds").post((req, res) => {
       res.status(400).send(err);
     });
 });
+
+seedRoutes.route("/configure").post((req, res) => {
+  changeIntervalCall(req, res)
+})
+
+async function changeIntervalCall(req, res){
+  try{
+    let result = await axios.post('https://ast-ntin-crawler.herokuapp.com/api/changeInterval', req.body)
+    res.status(200).send(result.data)
+  } catch(err){
+    console.log(err)
+    res.status(400).send(err)
+  }
+}
 
 async function loginManage(req, res){
   try {
