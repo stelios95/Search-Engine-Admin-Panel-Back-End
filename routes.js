@@ -11,9 +11,7 @@ seedRoutes.route("/login").post((req, res) => {
 })
 
 seedRoutes.use((req, res, next) => {
-  console.log(req.headers.authorization);
   let token = req.headers.authorization.split(" ")[1];
-  console.log("token" + token);
   if (token) {
     jwt.verify(token, "superSecret", (err, decoded) => {
       if (err) {
@@ -37,7 +35,6 @@ seedRoutes.use((req, res, next) => {
 });
 
 seedRoutes.route("/add").post((req, res) => {
-  console.log(req.body);
   let seed = new Seed({
     page: req.body.page,
     isSpa: req.body.isSpa,
@@ -47,11 +44,9 @@ seedRoutes.route("/add").post((req, res) => {
   seed
     .save()
     .then(() => {
-      console.log("saved!");
       res.status(200).send("saved!");
     })
     .catch(error => {
-      console.log(error);
       res.status(400).send(error);
     });
 });
@@ -67,7 +62,6 @@ seedRoutes.route("/fetchAll").get((req, res) => {
 });
 
 seedRoutes.route("/removeSeeds").post((req, res) => {
-  console.log("body: " + JSON.stringify(req.body));
   Seed.deleteMany({ _id: req.body })
     .then(result => {
       res.status(200).send(result);
@@ -79,28 +73,28 @@ seedRoutes.route("/removeSeeds").post((req, res) => {
 
 async function loginManage(req, res){
   try {
-    const saltRounds = 10;
-    hash = await bcrypt.hash(req.body.password, saltRounds)
     user = await User.findOne({ username: req.body.username})
-    if(user.length > 0){
-      hashMatches = await bcrypt.compare(user.password, hash)
+    let match
+    if(user) {
+      match = await bcrypt.compare(req.body.password, user.password)
     }
-    if(user.length > 0 && hashMatches){
+    if(user && match){
       const payload = {
         username: user.username
       };
       let token = jwt.sign(payload, "superSecret", {
         expiresIn: 60 * 60 * 24 // expires in 24 hours
       })
-      res.status(200).json({
+      res.json({
         message: "OK",
         token: token
       })
+      res.status(200).send()
     } else {
       res.status(401).send({ message: "Invalid Credentials" });
     }
   } catch (err) {
-    res.send(500).json({message: 'A Server Error Occured!'})
+    res.status(500).send({message: 'A Server Error Occured!'})
   }
 }
 module.exports = seedRoutes;
