@@ -39,18 +39,18 @@ app.listen(PORT, function() {
 });
 
 
-function createAdminUser(){
-  const saltRounds = 10
-  try{
-    bcrypt.hash('ntinos', saltRounds, function(err, hash) {
-      // Store hash in your password DB.
-      const user = new User({
-        username: 'stelios',
-        password: hash
-      })
-    user.save()
-  })
-  } catch(err){
-    console.log(err)
-  }
+// function createAdminUser(){
+//   const saltRounds = 10
+//   try{
+//     bcrypt.hash('ntinos', saltRounds, function(err, hash) {
+//       // Store hash in your password DB.
+//       const user = new User({
+//         username: 'stelios',
+//         password: hash
+//       })
+//     user.save()
+//   })
+//   } catch(err){
+//     console.log(err)
+//   }
 }
