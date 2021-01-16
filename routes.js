@@ -87,13 +87,7 @@ async function changeIntervalCall(req, res){
       intervals[0].fullScanInterval = req.body.crawlFreq
       intervals[0].updateContentTime = req.body.updateFreq
       await intervals[0].save()
-    } else {
-      const interval = new Interval({
-        fullScanInterval: req.body.crawlFreq,
-        updateContentTime: req.body.updateFreq
-      })
-      await interval.save()
-    }
+    } else throw 'no intervals found'
     res.status(200).send(result.data)
   } catch(err){
     console.log(err)
