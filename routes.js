@@ -6,21 +6,13 @@ let Seed = require("./seedSchema");
 let User = require("./userSchema");
 let Interval = require("./intervalSchema");
 const bcrypt = require('bcrypt');
-//const cors = require("cors");
+const cors = require("cors");
 const app = express()
 
-// app.use(cors())
+app.use(cors())
 
 seedRoutes.route("/getDefaultIntervals").get((req, res) => {
-  try {
-    const intervals = await Interval.find({ 'fullScanInterval' : { $exists: true, $ne: null } })
-    if (intervals.length) {
-      res.status(200).send(intervals[0])
-    } else throw 'no intervals found'
-  } catch (err) {
-    console.log(err)
-    res.status(400).send(err)
-  }
+  getDefaultIntervals(res)
 })
 
 seedRoutes.route("/fetchAll").get((req, res) => {
@@ -134,6 +126,18 @@ async function loginManage(req, res){
     }
   } catch (err) {
     res.status(500).send({message: 'A Server Error Occured!'})
+  }
+}
+
+async function getDefaultIntervals(res) {
+  try {
+    const intervals = await Interval.find({ 'fullScanInterval' : { $exists: true, $ne: null } })
+    if (intervals.length) {
+      res.status(200).send(intervals[0])
+    } else throw 'no intervals found'
+  } catch (err) {
+    console.log(err)
+    res.status(400).send(err)
   }
 }
 module.exports = seedRoutes;
