@@ -12,6 +12,7 @@ const app = express()
 app.use(cors())
 
 seedRoutes.route("/getDefaultIntervals").get((req, res) => {
+  console.log('inside')
   Interval.find({ 'fullScanInterval' : { $exists: true, $ne: null } })
     .then(intervals => {
       console.log(intervals)
