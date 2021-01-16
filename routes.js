@@ -14,9 +14,11 @@ app.use(cors())
 seedRoutes.route("/getDefaultIntervals").get((req, res) => {
   Interval.find({ 'fullScanInterval' : { $exists: true, $ne: null } })
     .then(intervals => {
+      console.log(intervals)
       res.status(200).send(intervals[0]);
     })
     .catch(err => {
+      console.log(err)
       res.status(400).send(err);
     });
 })
