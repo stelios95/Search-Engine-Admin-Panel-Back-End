@@ -6,10 +6,33 @@ let Seed = require("./seedSchema");
 let User = require("./userSchema");
 let Interval = require("./intervalSchema");
 const bcrypt = require('bcrypt');
-const cors = require("cors");
+//const cors = require("cors");
 const app = express()
 
-app.use(cors())
+// app.use(cors())
+
+seedRoutes.route("/getDefaultIntervals").get((req, res) => {
+  try {
+    const intervals = await Interval.find({ 'fullScanInterval' : { $exists: true, $ne: null } })
+    if (intervals.length) {
+      res.status(200).send(intervals[0])
+    } else throw 'no intervals found'
+  } catch (err) {
+    console.log(err)
+    res.status(400).send(err)
+  }
+})
+
+seedRoutes.route("/fetchAll").get((req, res) => {
+  Seed.find({}, "page _id isSpa method numberOfChildren")
+    .then(seeds => {
+      res.status(200).send(seeds);
+    })
+    .catch(err => {
+      res.status(400).send(err);
+    });
+});
+
 seedRoutes.route("/login").post((req, res) => {
   loginManage(req, res)
 })
@@ -55,16 +78,6 @@ seedRoutes.route("/add").post((req, res) => {
     });
 });
 
-seedRoutes.route("/fetchAll").get((req, res) => {
-  Seed.find({}, "page _id isSpa method numberOfChildren")
-    .then(seeds => {
-      res.status(200).send(seeds);
-    })
-    .catch(err => {
-      res.status(400).send(err);
-    });
-});
-
 seedRoutes.route("/removeSeeds").post((req, res) => {
   Seed.deleteMany({ _id: req.body })
     .then(result => {
@@ -75,17 +88,7 @@ seedRoutes.route("/removeSeeds").post((req, res) => {
     });
 });
 
-seedRoutes.route("/getDefaultIntervals").get((req, res) => {
-  try {
-    const intervals = await Interval.find({ 'fullScanInterval' : { $exists: true, $ne: null } })
-    if (intervals.length) {
-      res.status(200).send(intervals[0])
-    } else throw 'no intervals found'
-  } catch (err) {
-    console.log(err)
-    res.status(400).send(err)
-  }
-})
+
 
 seedRoutes.route("/configure").post((req, res) => {
   changeIntervalCall(req, res)
