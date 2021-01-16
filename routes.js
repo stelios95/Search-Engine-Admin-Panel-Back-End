@@ -12,7 +12,13 @@ const app = express()
 app.use(cors())
 
 seedRoutes.route("/getDefaultIntervals").get((req, res) => {
-  getDefaultIntervals(res)
+  Interval.find({ 'fullScanInterval' : { $exists: true, $ne: null } })
+    .then(intervals => {
+      res.status(200).send(intervals[0]);
+    })
+    .catch(err => {
+      res.status(400).send(err);
+    });
 })
 
 seedRoutes.route("/fetchAll").get((req, res) => {
@@ -129,16 +135,16 @@ async function loginManage(req, res){
   }
 }
 
-async function getDefaultIntervals(res) {
-  try {
-    const intervals = await Interval.find({ 'fullScanInterval' : { $exists: true, $ne: null } })
-    console.log(intervals)
-    if (intervals.length) {
-      res.status(200).send(intervals[0])
-    } else throw 'no intervals found'
-  } catch (err) {
-    console.log(err)
-    res.status(400).send(err)
-  }
-}
+// async function getDefaultIntervals(res) {
+//   try {
+//     const intervals = await Interval.find({ 'fullScanInterval' : { $exists: true, $ne: null } })
+//     console.log(intervals)
+//     if (intervals.length) {
+//       res.status(200).send(intervals[0])
+//     } else throw 'no intervals found'
+//   } catch (err) {
+//     console.log(err)
+//     res.status(400).send(err)
+//   }
+// }
 module.exports = seedRoutes;
