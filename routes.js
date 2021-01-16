@@ -4,6 +4,7 @@ const seedRoutes = express.Router();
 let jwt = require("jsonwebtoken");
 let Seed = require("./seedSchema");
 let User = require("./userSchema");
+let Interval = require("./intervalSchema");
 const bcrypt = require('bcrypt');
 const cors = require("cors");
 const app = express()
@@ -81,6 +82,18 @@ seedRoutes.route("/configure").post((req, res) => {
 async function changeIntervalCall(req, res){
   try{
     let result = await axios.post('https://ast-ntin-crawler.herokuapp.com/api/changeInterval', req.body)
+    const intervals = await Interval.find({ 'fullScanInterval' : { $exists: true, $ne: null } })
+    if (intervals.length) {
+      intervals[0].fullScanInterval = req.body.crawlFreq
+      intervals[0].updateContentTime = req.body.updateFreq
+      await intervals[0].save()
+    } else {
+      const interval = new Interval({
+        fullScanInterval: req.body.crawlFreq,
+        updateContentTime: req.body.updateFreq
+      })
+      await interval.save()
+    }
     res.status(200).send(result.data)
   } catch(err){
     console.log(err)
@@ -90,7 +103,7 @@ async function changeIntervalCall(req, res){
 
 async function loginManage(req, res){
   try {
-    user = await User.findOne({ username: req.body.username})
+    const user = await User.findOne({ username: req.body.username})
     let match
     if(user) {
       match = await bcrypt.compare(req.body.password, user.password)
