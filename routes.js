@@ -75,6 +75,18 @@ seedRoutes.route("/removeSeeds").post((req, res) => {
     });
 });
 
+seedRoutes.route("/getDefaultIntervals").get((req, res) => {
+  try {
+    const intervals = await Interval.find({ 'fullScanInterval' : { $exists: true, $ne: null } })
+    if (intervals.length) {
+      res.status(200).send(intervals[0])
+    } else throw 'no intervals found'
+  } catch (err) {
+    console.log(err)
+    res.status(400).send(err)
+  }
+})
+
 seedRoutes.route("/configure").post((req, res) => {
   changeIntervalCall(req, res)
 })
