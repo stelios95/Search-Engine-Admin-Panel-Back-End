@@ -132,6 +132,7 @@ async function loginManage(req, res){
 async function getDefaultIntervals(res) {
   try {
     const intervals = await Interval.find({ 'fullScanInterval' : { $exists: true, $ne: null } })
+    console.log(intervals)
     if (intervals.length) {
       res.status(200).send(intervals[0])
     } else throw 'no intervals found'
