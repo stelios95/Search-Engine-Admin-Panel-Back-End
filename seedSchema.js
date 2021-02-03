@@ -9,10 +9,6 @@ const seedSchema = new Schema({
     required: true,
     unique: true
   },
-  isSpa: {
-    type: Boolean,
-    required: true
-  },
   method: {
     type: Number,
     required: true

@@ -25,7 +25,7 @@ seedRoutes.route("/getDefaultIntervals").get((req, res) => {
 })
 
 seedRoutes.route("/fetchAll").get((req, res) => {
-  Seed.find({}, "page _id isSpa method numberOfChildren")
+  Seed.find({}, "page _id method numberOfChildren")
     .then(seeds => {
       res.status(200).send(seeds);
     })
@@ -65,7 +65,6 @@ seedRoutes.use((req, res, next) => {
 seedRoutes.route("/add").post((req, res) => {
   let seed = new Seed({
     page: req.body.page,
-    isSpa: req.body.isSpa,
     method: req.body.method,
     numberOfChildren: req.body.numberOfChildren
   });
